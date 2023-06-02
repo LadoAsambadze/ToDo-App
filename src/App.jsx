@@ -14,21 +14,25 @@ function App() {
 
   const deleteTodo = async (id) => {
     const response = await axios.delete(
-      `http://localhost:3000/api/deletetodos/${id}`
+      `https://todo-app-list-74x6.onrender.com/api/deletetodos/${id}`
     );
   };
   const deleteCompleted = async (active) => {
     const response = await axios.delete(
-      `http://localhost:3000/api/dltcomp/${active}`
+      `https://todo-app-list-74x6.onrender.com/api/dltcomp/${active}`
     );
   };
 
   const toggleTodo = async (id) => {
-    const response = await axios.put(`http://localhost:3000/api/puttodo/${id}`);
+    const response = await axios.put(
+      `https://todo-app-list-74x6.onrender.com/api/puttodo/${id}`
+    );
   };
 
   const fetch = async () => {
-    const response = await axios.get("http://localhost:3000/api/gettodos");
+    const response = await axios.get(
+      "https://todo-app-list-74x6.onrender.com/api/gettodos"
+    );
     setItems(response.data);
   };
 
@@ -50,10 +54,13 @@ function App() {
       return;
     }
 
-    const response = await axios.post("http://localhost:3000/api/posttodos", {
-      value: newItem,
-      active: iconStar,
-    });
+    const response = await axios.post(
+      "https://todo-app-list-74x6.onrender.com/api/posttodos",
+      {
+        value: newItem,
+        active: iconStar,
+      }
+    );
 
     const item = {
       id: Math.random(),
