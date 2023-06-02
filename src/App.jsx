@@ -3,13 +3,38 @@ import imageDark from "./images/todo-dark.png";
 import iconSun from "./images/icon-sun.svg";
 import iconCross from "./images/icon-cross.svg";
 import iconMoon from "./images/icon-moon.svg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 function App() {
   const [iconStar, setIconStar] = useState(false);
   const [newItem, setNewItem] = useState("");
   const [items, setItems] = useState([]);
   const [filter, setFilter] = useState("all");
+
+  const deleteTodo = async (id) => {
+    const response = await axios.delete(
+      `http://localhost:3000/api/deletetodos/${id}`
+    );
+  };
+  const deleteCompleted = async (active) => {
+    const response = await axios.delete(
+      `http://localhost:3000/api/dltcomp/${active}`
+    );
+  };
+
+  const toggleTodo = async (id) => {
+    const response = await axios.put(`http://localhost:3000/api/puttodo/${id}`);
+  };
+
+  const fetch = async () => {
+    const response = await axios.get("http://localhost:3000/api/gettodos");
+    setItems(response.data);
+  };
+
+  useEffect(() => {
+    fetch();
+  }, []);
 
   function changeTheme() {
     setIconStar(!iconStar);
@@ -19,30 +44,32 @@ function App() {
     setNewItem(event.target.value);
   };
 
-  function addItem() {
+  const addItem = async () => {
     if (!newItem) {
       alert("Press enter an item.");
       return;
     }
+
+    const response = await axios.post("http://localhost:3000/api/posttodos", {
+      value: newItem,
+      active: iconStar,
+    });
 
     const item = {
       id: Math.random(),
       value: newItem,
       active: false,
     };
+
     setItems((oldList) => [...oldList, item]);
     setNewItem("");
-  }
+  };
 
   function deleteItem(id) {
     const newArray = items.filter((item) => item.id !== id);
     setItems(newArray);
   }
 
-  function clearCompleted(active) {
-    const newArray = items.filter((item) => item.active !== active);
-    console.log(newArray);
-  }
   function markButton(id) {
     const newArrays = items.map((item) => {
       if (item.id === id) {
@@ -67,10 +94,10 @@ function App() {
     setFilter("completed");
   }
 
-  function clearCompleted(active) {
+  function clearCompleted() {
     const newArray = items.filter((item) => item.active === false);
+    deleteCompleted();
     setItems(newArray);
-    console.group(newArray);
   }
 
   function getVisibleItems() {
@@ -133,7 +160,10 @@ function App() {
                       className={`ground ${item.active ? "groundBack" : ""}`}
                     >
                       <button
-                        onClick={() => markButton(item.id)}
+                        onClick={() => {
+                          markButton(item.id);
+                          toggleTodo(item.id);
+                        }}
                         className={`mark ${item.active ? "marked" : ""}`}
                       ></button>
                     </div>
@@ -154,7 +184,10 @@ function App() {
                     </p>
                   </div>
                   <img
-                    onClick={() => deleteItem(item.id)}
+                    onClick={() => {
+                      deleteTodo(item.id);
+                      deleteItem(item.id);
+                    }}
                     src={iconCross}
                     className="close-button"
                     alt="close button"
